@@ -1,8 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
-import TextInput from "../components/TextInput";
-import Button from "../components/Button";
-import { addToCart, deleteFromCart, getCart, placeOrder } from "../api";
+import { addToCart, deleteFromCart, getCart, order } from "../api/index.js";
 import { useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import { useDispatch } from "react-redux";
@@ -10,172 +8,189 @@ import { openSnackbar } from "../redux/reducers/SnackbarSlice";
 import { DeleteOutline } from "@mui/icons-material";
 
 const Container = styled.div`
-  padding: 20px 30px;
-  padding-bottom: 200px;
-  height: 100%;
-  overflow-y: scroll;
   display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 30px;
-  @media (max-width: 768px) {
-    padding: 20px 12px;
-  }
-  background: ${({ theme }) => theme.bg};
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #f5f5f5;
 `;
 
-const Section = styled.div`
-  width: 100%;
-  max-width: 1400px;
-  padding: 32px 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 22px;
-  gap: 28px;
-`;
-
-const Title = styled.div`
-  font-size: 28px;
-  font-weight: 500;
-  display: flex;
-  justify-content: ${({ center }) => (center ? "center" : "space-between")};
-  align-items: center;
-`;
-
-const Wrapper = styled.div`
-  display: flex;
-  gap: 32px;
-  width: 100%;
-  padding: 12px;
-  @media (max-width: 750px) {
-    flex-direction: column;
-  }
-`;
-
-const Left = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  @media (max-width: 750px) {
-    flex: 1.2;
-  }
-`;
-
-const Table = styled.div`
-  font-size: 16px;
-  display: flex;
-  align-items: center;
-  gap: 30px;
-  ${({ head }) => head && `margin-bottom: 22px`}
-`;
-
-const TableItem = styled.div`
-  ${({ flex }) => flex && `flex: 1; `}
-  ${({ bold }) =>
-    bold &&
-    `font-weight: 600; 
-  font-size: 18px;`}
-`;
-
-const Counter = styled.div`
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  border: 1px solid ${({ theme }) => theme.text_secondary + 40};
+const DeliveryInfo = styled.div`
+  flex: 2;
+  background-color: #fff;
+  padding: 20px;
   border-radius: 8px;
-  padding: 4px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 `;
 
-const Product = styled.div`
-  display: flex;
-  gap: 16px;
-`;
-
-const Img = styled.img`
-  height: 80px;
-`;
-
-const Details = styled.div`
-  max-width: 130px;
-  @media (max-width: 700px) {
-    max-width: 60px;
-  }
-`;
-
-const Protitle = styled.div`
-  color: ${({ theme }) => theme.primary};
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const ProDesc = styled.div`
-  font-size: 14px;
-  font-weight: 400;
-  color: ${({ theme }) => theme.text_primary};
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-`;
-
-const ProSize = styled.div`
-  font-size: 14px;
-  font-weight: 500;
-`;
-
-const Right = styled.div`
+const OrderSummary = styled.div`
   flex: 1;
+  background-color: #fff;
+  padding: 20px;
+  margin-left: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+`;
+
+const Title = styled.h2`
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+`;
+
+const InputGroup = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 12px;
-  @media (max-width: 750px) {
-    flex: 0.8;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
+`;
+
+const Input = styled.input`
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+`;
+
+const ScheduleDelivery = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+`;
+
+const Toggle = styled.div`
+  margin-right: 10px;
+`;
+
+const PaymentMethod = styled.div`
+  margin-top: 20px;
+`;
+
+const MethodOption = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const RadioInput = styled.input`
+  margin-right: 10px;
+`;
+
+const Calendar = styled.div`
+  margin-bottom: 20px;
+`;
+
+const Note = styled.textarea`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  margin-top: 20px;
+`;
+
+const SummaryItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const ProductImage = styled.img`
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  margin-right: 10px;
+`;
+
+const ProductDetails = styled.div`
+  flex: 1;
+`;
+
+const ProductName = styled.h3`
+  font-size: 14px;
+  color: #333;
+`;
+
+const ProductPrice = styled.p`
+  font-size: 14px;
+  color: #888;
+`;
+
+const QuantityControl = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const QuantityButton = styled.button`
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  cursor: pointer;
+  &:hover {
+    background-color: #e0e0e0;
   }
 `;
 
-const Subtotal = styled.div`
-  font-size: 22px;
-  font-weight: 600;
+const QuantityInput = styled.input`
+  width: 40px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin: 0 5px;
+`;
+
+const TotalAmount = styled.div`
+  margin-top: 20px;
+  font-size: 18px;
+  font-weight: bold;
   display: flex;
   justify-content: space-between;
 `;
 
-const Delivery = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-  display: flex;
-  gap: 6px;
-  flex-direction: column;
+const ConfirmButton = styled.button`
+  width: 100%;
+  padding: 15px;
+  background-color: #556b2f;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  &:hover {
+    background-color: #6b8e23;
+  }
 `;
 
-const Cart = () => {
+const OrderPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
   const [reload, setReload] = useState(false);
-  const [products, setProducts] = useState([]);
+  const [product, setProduct] = useState([]);
   const [buttonLoad, setButtonLoad] = useState(false);
   const [deliveryDetails, setDeliveryDetails] = useState({
     firstName: "",
-    lastName: "",
     emailAddress: "",
     phoneNumber: "",
-    completeAddress: "",
+    address: {
+      City: "",
+      state: "",
+      ZIP: "",
+      complete_address: "",
+    },
   });
-
   //done working
   const getProducts = async () => {
     setLoading(true);
     const Id = localStorage.getItem("user_Id");
-    try { 
+    try {
       const res = await getCart({
-        uid : Id
-      })
-      .then((res)=>{
-        console.log('console from cart compo getProducts method',res.data)
-        setProducts(res.data)
-      })
+        uid: Id,
+      }).then((res) => {
+        console.log("console from cart compo getProducts method", res.data);
+        setProduct(res.data);
+      });
       setLoading(false);
     } catch (error) {
       console.error("Error fetching cart data:", error);
@@ -185,65 +200,77 @@ const Cart = () => {
   };
 
   const calculateSubtotal = () => {
-    return products.reduce(
+    const cartItem = product.reduce(
       (total, item) => total + item.quantity * item?.product?.price?.org,
       0
     );
+    const Tax = (cartItem * 18) / 100;
+    const Total = cartItem + Tax;
+    return Total;
   };
 
-  const convertAddressToString = (addressObj) => {
-    // Convert the address object to a string representation
-    return `${addressObj.firstName} ${addressObj.lastName}, ${addressObj.completeAddress}, ${addressObj.phoneNumber}, ${addressObj.emailAddress}`;
-  };
-
-  const PlaceOrder = async () => {
-    setButtonLoad(true);
+  const userOrder = async () => {
     try {
-      const isDeliveryDetailsFilled =
-        deliveryDetails.firstName &&
-        deliveryDetails.lastName &&
-        deliveryDetails.completeAddress &&
-        deliveryDetails.phoneNumber &&
-        deliveryDetails.emailAddress;
-
-      if (!isDeliveryDetailsFilled) {
-        // Show an error message or handle the situation where delivery details are incomplete
-        dispatch(
-          openSnackbar({
-            message: "Please fill in all required delivery details.",
-            severity: "error",
-          })
-        );
-        return;
-      }
-
-      const token = localStorage.getItem("krist-app-token");
-      const totalAmount = calculateSubtotal().toFixed(2);
-      const orderDetails = {
-        products,
-        address: convertAddressToString(deliveryDetails),
-        totalAmount,
+      const Id = localStorage.getItem("user_Id");
+      const TotalAmount = calculateSubtotal();
+      const Details = {
+        Username: deliveryDetails.firstName,
+        total_amount: TotalAmount,
+        address: {
+          city: deliveryDetails.address.City,
+          state: deliveryDetails.address.state,
+          ZIP: deliveryDetails.address.ZIP,
+          complete_address: deliveryDetails.address.complete_address,
+        },
+        products: product.map((item) => {
+          return {
+            productId: item._Id,
+            quantity: item.quantity,
+          };
+        }),
+        user: "user_id", // Replace with actual user ID
+        status: "Pending", // or any other status
       };
-
-      await placeOrder(token, orderDetails);
-      dispatch(
-        openSnackbar({
-          message: "Order placed successfully",
-          severity: "success",
-        })
-      );
-      setReload(!reload);
-    } catch (err) {
-      dispatch(
-        openSnackbar({
-          message: "Failed to place order. Please try again.",
-          severity: "error",
-        })
-      );
-    } finally {
-      setButtonLoad(false);
+    } catch (error) {
+      console.log(error);
     }
   };
+
+  const newhandler = async () => {
+    try {
+      const Id = localStorage.getItem("user_Id");
+      const TotalAmount = calculateSubtotal();
+      const Details = {
+        Username: deliveryDetails.firstName,
+        total_amount: TotalAmount,
+        address: {
+          city: deliveryDetails.address.City,
+          state: deliveryDetails.address.state,
+          ZIP: deliveryDetails.address.ZIP,
+          complete_address: deliveryDetails.address.complete_address,
+        },
+        products: product.map((item) => ({
+          productId: item.product._id,
+          quantity: item.quantity,
+        })),
+        user: Id,
+        status: "Pending", 
+      };
+  
+      const response = await order(Details)
+      .then((res)=>{
+        if(res){
+          window.location.reload()
+        }
+      })  
+      console.log("Order placed successfully", response.data);
+    } catch (error) {
+      console.error("Error placing order", error);
+    }
+  };
+  
+  
+
 
   useEffect(() => {
     getProducts();
@@ -254,15 +281,15 @@ const Cart = () => {
     const userId = localStorage.getItem("user_Id");
     try {
       await addToCart({ pid: id, uid: userId, qun: 1 });
-  
-      setProducts((prevProducts) =>
+
+      setProduct((prevProducts) =>
         prevProducts.map((item) =>
           item.product._id === id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         )
       );
-  
+
       dispatch(
         openSnackbar({
           message: "Product quantity increased",
@@ -284,16 +311,16 @@ const Cart = () => {
     const userId = localStorage.getItem("user_Id");
     let qnt = quantity > 0 ? 1 : null;
     if (type === "full") qnt = null;
-  
+
     try {
       await deleteFromCart({ pid: id, qun: qnt, uid: userId });
-  
+
       if (type === "full") {
-        setProducts((prevProducts) =>
+        setProduct((prevProducts) =>
           prevProducts.filter((item) => item.product._id !== id)
         );
       } else {
-        setProducts((prevProducts) =>
+        setProduct((prevProducts) =>
           prevProducts.map((item) =>
             item.product._id === id
               ? { ...item, quantity: item.quantity - 1 }
@@ -301,7 +328,7 @@ const Cart = () => {
           )
         );
       }
-  
+
       dispatch(
         openSnackbar({
           message: "Product quantity decreased",
@@ -320,149 +347,169 @@ const Cart = () => {
 
   return (
     <Container>
-      <Section>
-        <Title>Your Shopping Cart</Title>
-        {loading ? (
-          <CircularProgress />
-        ) : (
+      <DeliveryInfo>
+        <Title>Delivery Information</Title>
+        <InputGroup>
+          <Input
+            type="text"
+            placeholder="Name"
+            value={deliveryDetails.firstName}
+            onChange={(e) =>
+              setDeliveryDetails((prev) => ({
+                ...prev,
+                firstName: e.target.value,
+              }))
+            }
+          />
+          <Input
+            type="text"
+            placeholder="Mobile Number"
+            value={deliveryDetails.phoneNumber}
+            onChange={(e) =>
+              setDeliveryDetails((prev) => ({
+                ...prev,
+                phoneNumber: e.target.value,
+              }))
+            }
+          />
+        </InputGroup>
+        <InputGroup>
+          <Input
+            type="email"
+            placeholder="Email"
+            value={deliveryDetails.emailAddress}
+            onChange={(e) =>
+              setDeliveryDetails((prev) => ({
+                ...prev,
+                emailAddress: e.target.value,
+              }))
+            }
+          />
+          <Input
+            type="text"
+            placeholder="City"
+            value={deliveryDetails.address.City}
+            onChange={(e) =>
+              setDeliveryDetails((prevdata) => ({
+                ...prevdata,
+                address: {
+                  ...prevdata.address,
+                  City: e.target.value,
+                },
+              }))
+            }
+          />
+        </InputGroup>
+        <InputGroup>
+          <Input
+            type="text"
+            placeholder="State"
+            value={deliveryDetails.address.state}
+            onChange={(e) =>
+              setDeliveryDetails((prevdata) => ({
+                ...prevdata,
+                address: {
+                  ...prevdata.address,
+                  state: e.target.value,
+                },
+              }))
+            }
+          />
+          <Input
+            type="text"
+            placeholder="ZIP"
+            value={deliveryDetails.address.ZIP}
+            onChange={(e) =>
+              setDeliveryDetails((prevdata) => ({
+                ...prevdata,
+                address: {
+                  ...prevdata.address,
+                  ZIP: e.target.value,
+                },
+              }))
+            }
+          />
+        </InputGroup>
+        <Input
+          type="text"
+          placeholder="Address"
+          value={deliveryDetails.address.complete_address}
+          onChange={(e) =>
+            setDeliveryDetails((prevdata) => ({
+              ...prevdata,
+              address: {
+                ...prevdata.address,
+                complete_address: e.target.value,
+              },
+            }))
+          }
+        />
+
+        <ScheduleDelivery>
+          <Toggle>
+            <input type="checkbox" />
+          </Toggle>
+          <div>Schedule Delivery</div>
+        </ScheduleDelivery>
+
+        <Calendar>
+          {/* You can use a date picker library here */}
+          <p>Select Delivery Date</p>
+        </Calendar>
+
+        <PaymentMethod>
+          <Title>Payment Method</Title>
+          <MethodOption>
+            <RadioInput type="radio" name="payment" /> Online Payment
+          </MethodOption>
+          <MethodOption>
+            <RadioInput type="radio" name="payment" /> Cash on Delivery
+          </MethodOption>
+          <MethodOption>
+            <RadioInput type="radio" name="payment" /> POS on Delivery
+          </MethodOption>
+        </PaymentMethod>
+
+        <Note placeholder="Type your note"></Note>
+      </DeliveryInfo>
+
+      <OrderSummary>
+        <Title>Order Summary</Title>
+        {product.map((item, index) => (
           <>
-            {products.length === 0 ? (
-              <>Cart is empty</>
-            ) : (
-              <Wrapper>
-                <Left>
-                  <Table>
-                    <TableItem bold flex>
-                      Product
-                    </TableItem>
-                    <TableItem bold>Price</TableItem>
-                    <TableItem bold>Quantity</TableItem>
-                    <TableItem bold>Subtotal</TableItem>
-                    <TableItem></TableItem>
-                  </Table>
-                  {products.map((item) => (
-                    <Table key={item?.product?._id}>
-                      <TableItem flex>
-                        <Product>
-                          <Img src={item?.product?.img} />
-                          <Details>
-                            <Protitle>{item?.product?.name}</Protitle>
-                            <ProDesc>{item?.product?.desc}</ProDesc>
-                          </Details>
-                        </Product>
-                      </TableItem>
-                      <TableItem>${item?.product?.price?.org}</TableItem>
-                      <TableItem>
-                        <Counter>
-                          <div
-                            style={{
-                              cursor: "pointer",
-                              flex: 1,
-                            }}
-                            onClick={() =>
-                              removeCart(item?.product?._id, item?.quantity - 1)
-                            }
-                          >
-                            -
-                          </div>
-                          {item?.quantity}
-                          <div
-                            style={{
-                              cursor: "pointer",
-                              flex: 1,
-                            }}
-                            onClick={() => addCart(item?.product?._id)}
-                          >
-                            +
-                          </div>
-                        </Counter>
-                      </TableItem>
-                      <TableItem>
-                        ${item?.quantity * item?.product?.price?.org}
-                      </TableItem>
-                      <TableItem
-                        onClick={() =>
-                          removeCart(item?.product?._id, item?.quantity, "full")
-                        }
-                      >
-                        <DeleteOutline />
-                      </TableItem>
-                    </Table>
-                  ))}
-                </Left>
-                <Right>
-                  <Subtotal>
-                    <span>Subtotal:</span>
-                    <span>${calculateSubtotal().toFixed(2)}</span>
-                  </Subtotal>
-                  <Delivery>
-                    <input
-                      type="text"
-                      placeholder="First Name"
-                      value={deliveryDetails.firstName}
-                      onChange={(e) =>
-                        setDeliveryDetails({
-                          ...deliveryDetails,
-                          firstName: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Last Name"
-                      value={deliveryDetails.lastName}
-                      onChange={(e) =>
-                        setDeliveryDetails({
-                          ...deliveryDetails,
-                          lastName: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="email"
-                      placeholder="Email Address"
-                      value={deliveryDetails.emailAddress}
-                      onChange={(e) =>
-                        setDeliveryDetails({
-                          ...deliveryDetails,
-                          emailAddress: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Phone Number"
-                      value={deliveryDetails.phoneNumber}
-                      onChange={(e) =>
-                        setDeliveryDetails({
-                          ...deliveryDetails,
-                          phoneNumber: e.target.value,
-                        })
-                      }
-                    />
-                    <input
-                      type="text"
-                      placeholder="Complete Address"
-                      value={deliveryDetails.completeAddress}
-                      onChange={(e) =>
-                        setDeliveryDetails({
-                          ...deliveryDetails,
-                          completeAddress: e.target.value,
-                        })
-                      }
-                    />
-                  </Delivery>
-                  <button onClick={PlaceOrder} disabled={buttonLoad}>
-                    {buttonLoad ? "Placing Order..." : "Place Order"}
-                  </button>
-                </Right>
-              </Wrapper>
-            )}
+            <SummaryItem key={index}>
+              <ProductImage src={item?.product?.img} alt="Product" />
+              <ProductDetails>
+                <ProductName>{item?.product?.name}</ProductName>
+                <ProductPrice>${item?.product?.price?.org}</ProductPrice>
+              </ProductDetails>
+              <QuantityControl>
+                <QuantityButton
+                  onClick={() =>
+                    removeCart(item?.product?._id, item?.quantity - 1)
+                  }
+                >
+                  -
+                </QuantityButton>
+                <QuantityInput type="text" value={item?.quantity} />
+                <QuantityButton onClick={() => addCart(item?.product?._id)}>
+                  +
+                </QuantityButton>
+              </QuantityControl>
+            </SummaryItem>
           </>
-        )}
-      </Section>
+        ))}
+        <TotalAmount>
+          <span>Total (+Tax):</span>
+          <span>${calculateSubtotal()}</span>
+        </TotalAmount>
+
+        <ConfirmButton onClick={() => newhandler()}>
+          {buttonLoad ? "placing order..." : "confirm order"}
+        </ConfirmButton>
+      </OrderSummary>
     </Container>
   );
 };
 
-export default Cart;
+export default OrderPage;

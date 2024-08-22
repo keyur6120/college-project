@@ -195,16 +195,16 @@ const FoodDetails = () => {
   const checkFavorite = async () => {
     setFavoriteLoading(true);
     const Id = localStorage.getItem("user_Id");
-    await getFavourite({ pid: id, uid: Id })
+    await getFavourite({ uid: Id })
       .then((res) => {
-        const IdEx = res.data.map((item) => {
+        const favourit = res.data.map((item) => {
           return item._id;
         });
-        const find = IdEx.some((fav) => fav._Id === product?._id);
-        console.log("form food details", find);
-
-        setFavorite(find);
-
+        if (favourit.includes(id)) {
+          setFavorite(true);
+        } else {
+          setFavorite(false);
+        }
         setFavoriteLoading(false);
       })
       .catch((err) => {
@@ -221,7 +221,7 @@ const FoodDetails = () => {
   useEffect(() => {
     getProduct();
     checkFavorite();
-  }, []);
+  }, [favorite]);
 
   // done
   const addCart = async (condition) => {
@@ -288,7 +288,9 @@ const FoodDetails = () => {
               <Button
                 text="Order Now"
                 full
-                onClick={() => {addCart(true)}}
+                onClick={() => {
+                  addCart(true);
+                }}
               />
               <Button
                 leftIcon={

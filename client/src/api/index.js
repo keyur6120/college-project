@@ -43,7 +43,7 @@ export const deleteFromCart = async ({ pid, uid, qun }) =>
 export const getFavourite = async ({uid, pid}) =>
   await MYDB.get(`/user/getfav`,
     {
-      params : {userId : uid, productId : pid}
+      params : {userId : uid}
     }
   );
 
@@ -56,13 +56,10 @@ export const deleteFromFavourite = async ({pid,uid}) =>
   await MYDB.patch(`/user/removefav`,{productId: pid , userId : uid});
 
 //Orders
-export const placeOrder = async (token, data) => (
-  await MYDB.post(`/user/order/`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  }));
+export const order = async  (data) => await MYDB.post(`/user/order`, data);
 
 export const getOrders = async (token) =>
-  await MYDB.get(`/user/order/`, {
+  await MYDB.get(`/user/userOrder`, {
     headers: { Authorization: `Bearer ${token}` },
   });
 

@@ -182,16 +182,16 @@ const ProductsCard = ({ product }) => {
 
   const checkFavorite = async () => {
     setFavoriteLoading(true);
+    const productId = product._id
     const Id = localStorage.getItem("user_Id");
-    await getFavourite({ pid: product?._id , uid : Id})
+    await getFavourite({uid : Id})
       .then((res) => {
        const IdEx = res.data.map((item)=>{
         return item._id
        })
-       const find  = IdEx.some((fav)=> fav._Id === product?._id )
-       console.log('from productcards',find)
-        setFavorite(find);
-
+       if(productId === IdEx){
+         setFavorite(true);
+       }
         setFavoriteLoading(false);
       })
       .catch((err) => {

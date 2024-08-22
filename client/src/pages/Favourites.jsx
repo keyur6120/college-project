@@ -49,6 +49,7 @@ const Favourites = () => {
     const Id = localStorage.getItem("user_Id");
     await getFavourite({uid : Id}).then((res) => {
       setProducts(res.data);
+      console.log('fav component ')
       setLoading(false);
     });
   };

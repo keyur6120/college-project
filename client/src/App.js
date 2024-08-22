@@ -12,6 +12,7 @@ import FoodListing from "./pages/FoodListing";
 import { useSelector } from "react-redux";
 import Order from './pages/order'
 import AuthRoutes from './Authentication/AuthRoutes.jsx'
+import Testing from './Testing/Testing.jsx'
 
 const Container = styled.div``;
 
@@ -32,6 +33,7 @@ function App() {
             <Route path="/" exact element={<Home />} />
             <Route path="/dishes/:id" exact element={<FoodDetails />} />
             <Route path="/dishes" exact element={<FoodListing />} />
+            <Route path="/Testing" exact element={<Testing/>} />
             <Route element={<AuthRoutes />}>
               <Route path="/orders" exact element={<Order />} />
               <Route path="/favorite" exact element={<Favourites />} />
