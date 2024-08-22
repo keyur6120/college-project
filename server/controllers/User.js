@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import jwt from 'jsonwebtoken'
 import { createError } from "../error.js";
 import User from "../models/User.js";
+import Food from '../models/Food.js'
 import Orders from "../models/Orders.js";
 import SplitBills from '../models/SplitBills.js';
 
@@ -52,7 +53,7 @@ export const UserLogin = async (req, res, next) => {
       return next(createError(409, "User not found."));
     }
 
-    const isPasswordCorrect = await bcrypt.compareSync(password, user.password);
+    const isPasswordCorrect = bcrypt.compareSync(password, user.password);
     if (!isPasswordCorrect) {
       return next(createError(403, "Incorrect password"));
     }
@@ -152,30 +153,29 @@ export const getAllCartItems = async (req, res, next) => {
 };
 
 //Orders
-
-export const placeOrder = async (req, res, next) => {
+export const newOrder = async (req, res) => {
   try {
-    const { products, address, totalAmount, userId } = req.body;
-    const user = await User.findById(userId);
-
-    const order = new Orders({
-      products,
-      user: user._id,
-      total_amount: totalAmount,
+    const { Username, total_amount, address, products, user, status } = req.body
+    const neworder = new Orders({
+      Username,
+      total_amount,
       address,
-    });
+      products,
+      user,
+      status
+    })
+    const usercheck  = await User.findById(user)
 
-    const saveOrder = await order.save();
-    user.orders.push(saveOrder)
-    user.cart = []
-    await user.save();
-    return res
-      .status(200)
-      .json({ message: "Order placed successfully", order });
-  } catch (err) {
-    next(err);
+    usercheck.orders.push(neworder)
+    usercheck.cart = []
+    await usercheck.save()
+    res.status(200).json({ message: "sucessfull order"})
+
+  } catch (error) {
+    res.status(500).json({ message: "error in placeOrder in user.js", error })
   }
-};
+}
+
 
 export const getAllOrders = async (req, res, next) => {
   try {
@@ -235,7 +235,7 @@ export const addToFavorites = async (req, res, next) => {
 
 export const getUserFavorites = async (req, res, next) => {
   try {
-    const { userId, productId } = req.query
+    const { userId } = req.query
 
     const user = await User.findById(userId).populate("favourites").exec();
     if (!user) {
@@ -321,13 +321,11 @@ export const getUserOrders = async (req, res, next) => {
   try {
     const { userId } = req.query;
 
+    console.log(userId)
     const user = await User.findById(userId)
       .populate({
         path: 'orders',
-        populate: {
-          path: 'products.product', // Populating the product details within the order
-          model: 'Food',            // Ensure to replace 'Food' with the actual model name if different
-        },
+        select: 'address username products total_amount user ',
       });
 
     if (!user) {

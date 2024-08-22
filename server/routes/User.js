@@ -7,7 +7,7 @@ import {
   getAllCartItems,
   getAllOrders,
   getUserFavorites,
-  placeOrder,
+  newOrder,
   removeFromCart,
   removeFromFavorites,
   getverfied,
@@ -36,7 +36,7 @@ router.post("/addfav", addToFavorites);
 router.get("/getfav", getUserFavorites);
 router.patch("/removefav", removeFromFavorites);
 
-router.post("/order", placeOrder);
+router.post("/order", newOrder);
 router.get("/getOrder", getAllOrders);
 router.get("/userOrder",getUserOrders)
 
