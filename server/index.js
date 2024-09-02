@@ -6,6 +6,7 @@ import UserRoutes from "./routes/User.js";
 import FoodRoutes from "./routes/Food.js";
 import MakeRestro from './routes/Restaurant.js'
 import cookieParser from "cookie-parser";
+import Category from './routes/Category.js'
 dotenv.config();
 
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.urlencoded({ extended: true })); // for form data
 app.use("/user/", UserRoutes);
 app.use("/food/", FoodRoutes);
 app.use("/newuser",MakeRestro)
+app.use("/category",Category)
 
 // error handler
 app.use((err, req, res, next) => {

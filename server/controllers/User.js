@@ -7,7 +7,7 @@ import User from "../models/User.js";
 import Food from '../models/Food.js'
 import Orders from "../models/Orders.js";
 import SplitBills from '../models/SplitBills.js';
-
+import Category from '../models/CategorySchema.js'
 dotenv.config();
 
 //user registration
@@ -164,12 +164,17 @@ export const newOrder = async (req, res) => {
       user,
       status
     })
-    const usercheck  = await User.findById(user)
+    const usercheck = await User.findById(user)
 
-    usercheck.orders.push(neworder)
+    const saveorder = await neworder.save()
+    
+    usercheck.orders.push(saveorder)
+    
     usercheck.cart = []
+    
     await usercheck.save()
-    res.status(200).json({ message: "sucessfull order"})
+    
+    res.status(200).json({ message: "sucessfull order" })
 
   } catch (error) {
     res.status(500).json({ message: "error in placeOrder in user.js", error })
@@ -177,22 +182,22 @@ export const newOrder = async (req, res) => {
 }
 
 
-export const getAllOrders = async (req, res, next) => {
-  try {
-    const { productId, userId } = req.body;
+// export const getAllOrders = async (req, res, next) => {
+//   try {
+//     const { productId, userId } = req.body;
 
-    const user = await User.findById(userId);
-    if (!user.favourites.includes(productId)) {
-      user.favourites.push(productId);
-      await user.save();
-    }
-    return res
-      .status(200)
-      .json({ message: "Product added to favorites successfully", user });
-  } catch (err) {
-    next(err);
-  }
-};
+//     const user = await User.findById(userId);
+//     if (!user.favourites.includes(productId)) {
+//       user.favourites.push(productId);
+//       await user.save();
+//     }
+//     return res
+//       .status(200)
+//       .json({ message: "Product added to favorites successfully", user });
+//   } catch (err) {
+//     next(err);
+//   }
+// };
 
 //Favorites
 
@@ -320,22 +325,20 @@ export const SplitBill = async (req, res) => {
 export const getUserOrders = async (req, res, next) => {
   try {
     const { userId } = req.query;
-
-    console.log(userId)
+    // console.log('userId', userId)
     const user = await User.findById(userId)
       .populate({
         path: 'orders',
-        select: 'address username products total_amount user ',
+        select: 'address products',  
       });
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-
-    return res
-      .status(200)
-      .json({ orders: user.orders });
+    return res.status(200).json(user.orders)
   } catch (err) {
     next(err);
   }
 };
+
+

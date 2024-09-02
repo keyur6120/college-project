@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Food from "../models/Food.js";
+import {createError} from '../error.js'
 
 
 //! not created yet
@@ -89,4 +90,21 @@ export const getFoodById = async (req, res, next) => {
     next(err);
   }
 };
+
+// create food category 
+
+export const createCategory = async(req,res,next) => {
+try {
+  const {name, Url} = req.body
+    const category = new Category({
+      name: name,
+      image: Url
+    })
+   await category.save()
+   res.status(200).json({message:'done'})
+} catch (error) {
+  res.status(500).json({message: "error at category controller", error})
+}
+}
+
 
