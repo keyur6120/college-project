@@ -6,6 +6,7 @@ import ProductCategoryCard from "../components/cards/ProductCategoryCard";
 import ProductsCard from "../components/cards/ProductsCard";
 import { getAllProducts } from "../api/index.js";
 import { CircularProgress } from "@mui/material";
+import { getCategory } from "../api/index.js";
 
 const Container = styled.div`
   padding: 20px 30px;
@@ -52,6 +53,7 @@ const CardWrapper = styled.div`
 const Home = () => {
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [category, setcategory] = useState([]);
 
   const getProducts = async () => {
     setLoading(true);
@@ -61,8 +63,15 @@ const Home = () => {
     });
   };
 
+  const getCategories = async () => {
+    await getCategory().then((res) => {
+      setcategory(res.data);
+      console.log(res.data);
+    });
+  };
   useEffect(() => {
     getProducts();
+    getCategories();
   }, []);
 
   return (
@@ -73,20 +82,17 @@ const Home = () => {
       <Section>
         <Title>Food Categories</Title>
         <CardWrapper>
-          {category.map((category) => (
-            <ProductCategoryCard category={category} />
-          ))}
+          <ProductCategoryCard />
         </CardWrapper>
       </Section>
-
       <Section>
         <Title>Most Popular</Title>
         {loading ? (
           <CircularProgress />
         ) : (
           <CardWrapper>
-            {products.map((product) => (
-              <ProductsCard product={product} />
+            {products.map((product, index) => (
+              <ProductsCard product={product} key={index} />
             ))}
           </CardWrapper>
         )}

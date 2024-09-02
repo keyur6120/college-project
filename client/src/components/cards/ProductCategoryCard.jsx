@@ -1,100 +1,74 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { getCategory } from "../../api/index.js";
 
-const Card = styled.div`
-  width: 250px;
+const SliderWrapper = styled.div`
+  width: 100%;
+  overflow-x: scroll;
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  padding: 20px 0;
+  gap: 10px;
+`;
+
+const CategoryItem = styled.div`
+  flex: 0 0 auto;
+  width: 150px;
+  margin: 0 10px;
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  background-color: #fff;
   transition: all 0.3s ease-out;
   cursor: pointer;
-
-  @media (max-width: 600px) {
-    width: 170px;
+  &:hover {
+    transform: translateY(-10px);
+  }
+  overfll
+  &::-webkit-scrollbar {
+    display: none; /* Hide scrollbar in Chrome, Safari, and other WebKit browsers */
   }
 `;
 
 const Image = styled.img`
-  width: 100%;
-  height: 320px;
-  border-radius: 6px;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
-  transition: all 0.3s ease-out;
-  @media (max-width: 600px) {
-    height: 230px;
-  }
-`;
-const Top = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  border-radius: 6px;
-  transition: all 0.3s ease-out;
-  &:hover {
-    background-color: ${({ theme }) => theme.text_primary};
-  }
-  &:hover ${Image} {
-    opacity: 0.8;
-  }
-`;
-const Menu = styled.div`
-  width: 100%;
-  position: absolute;
-  z-index: 10;
-  color: ${({ theme }) => theme.text_primary};
-  bottom: 0px;
-  left: 50;
-  right: 50;
-  display: flex;
-  gap: 12px;
-`;
-const Button = styled.div`
-  width: 100%;
-  color: ${({ theme }) => theme.white};
-  padding: 12px 20px;
-  background: white;
-  border-radius: 12px;
-  text-align: center;
-  font-weight: 500;
-  background: linear-gradient(
-    to top,
-    ${({ theme }) => theme.black} 30%,
-    transparent
-  );
-  @media (max-width: 600px) {
-    padding: 6px 14px;
-  }
-`;
-const Sale = styled.div`
-  position: absolute;
-  z-index: 10;
-  color: ${({ theme }) => theme.text_primary};
-  top: 10px;
-  right: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  color: white;
-  background: green;
-  padding: 3px 6px;
-  border-radius: 4px;
-  @media (max-width: 600px) {
-    font-size: 10px;
-  }
+  border-radius: 50%;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 10px;
 `;
 
-const ProductCategoryCard = ({ category }) => {
+const CategoryName = styled.div`
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
+`;
+
+const CategorySlider = () => {
+  const [categories, setCategories] = useState([]);
+  const[data, setData] = useState([]);
+
+  const getCategories = async () => {
+    await getCategory().then((res) => {
+      setCategories(res.data);
+      console.log(res.data);
+    });
+  };
+console.log("data", data)
+  useEffect(() => {
+    getCategories();
+  }, []);
+
   return (
-    <Card>
-      <Top>
-        <Image src={category.img} />
-        <Menu>
-          <Button>{category.name}</Button>
-        </Menu>
-        <Sale>{category.off}</Sale>
-      </Top>
-    </Card>
+    <SliderWrapper>
+      {categories.map((category, index) => (
+        <CategoryItem key={index} onClick={()=>setData(category.name)}>
+          <Image src={category.image} alt={category.name}  />
+          <CategoryName>{category.name}</CategoryName>
+        </CategoryItem>
+      ))}
+    </SliderWrapper>
   );
 };
 
-export default ProductCategoryCard;
+export default CategorySlider;

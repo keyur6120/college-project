@@ -5,13 +5,15 @@ import { useNavigate } from "react-router-dom";
 import { CircularProgress } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { openSnackbar } from "../redux/reducers/SnackbarSlice";
-import { DeleteOutline } from "@mui/icons-material";
+import Download from '../utils/Images/download.png'
 
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
   background-color: #f5f5f5;
+   height: 100vh; /* Ensure full viewport height */
+  overflow: hidden; /* Prevent the entire page from scrolling */
 `;
 
 const DeliveryInfo = styled.div`
@@ -20,6 +22,8 @@ const DeliveryInfo = styled.div`
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  max-height: calc(100vh - 60px); /* Adjust this value as needed */
+  overflow-y: auto; /* Enable vertical scroll */
 `;
 
 const OrderSummary = styled.div`
@@ -29,6 +33,8 @@ const OrderSummary = styled.div`
   margin-left: 20px;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+   max-height: calc(100vh - 60px); /* Adjust this value as needed */
+  overflow-y: auto; /* Enable vertical scroll */
 `;
 
 const Title = styled.h2`
@@ -162,6 +168,8 @@ const ConfirmButton = styled.button`
   }
 `;
 
+
+
 const OrderPage = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -201,9 +209,7 @@ const OrderPage = () => {
 
   const calculateSubtotal = () => {
     const cartItem = product.reduce(
-      (total, item) => total + item.quantity * item?.product?.price?.org,
-      0
-    );
+      (total, item) => total + item.quantity * item?.product?.price?.org,0);
     const Tax = (cartItem * 18) / 100;
     const Total = cartItem + Tax;
     return Total;
@@ -268,13 +274,6 @@ const OrderPage = () => {
       console.error("Error placing order", error);
     }
   };
-  
-  
-
-
-  useEffect(() => {
-    getProducts();
-  }, [reload]);
 
   //done
   const addCart = async (id) => {
@@ -344,6 +343,11 @@ const OrderPage = () => {
       );
     }
   };
+
+  useEffect(() => {
+    getProducts();
+   
+  }, [reload,product,buttonLoad]);
 
   return (
     <Container>
@@ -499,7 +503,7 @@ const OrderPage = () => {
             </SummaryItem>
           </>
         ))}
-        <TotalAmount>
+        <TotalAmount> 
           <span>Total (+Tax):</span>
           <span>${calculateSubtotal()}</span>
         </TotalAmount>

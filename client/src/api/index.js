@@ -5,9 +5,9 @@ export const MYDB = axios.create({
 
 });
 
-const API = axios.create({
-  baseURL: "https://fooddelivery-mern.onrender.com/api/"
-})
+// const API = axios.create({
+//   baseURL: "https://fooddelivery-mern.onrender.com/api/"
+// })
 
 export const UserSignUp = async (data) => await MYDB.post("/user/signup", data);
 export const UserSignIn = async (data) => await MYDB.post("/user/signin", data);
@@ -20,7 +20,7 @@ export const getAllProducts = async (filter) => await MYDB.get(`/food?${filter}`
 export const getProductDetails = async (id) => await MYDB.get(`/food/${id}`);
 
 //Cart
-// done 
+
 export const getCart = async ({ uid }) =>
   await MYDB.get(`/user/getallcartItem`, {
     params: { userId: uid }
@@ -39,7 +39,6 @@ export const deleteFromCart = async ({ pid, uid, qun }) =>
   await MYDB.patch(`/user/RemovecartItem`, { productId: pid, quantity: qun, Id: uid });
 
 //favorites
-// but work when user has fac
 export const getFavourite = async ({uid, pid}) =>
   await MYDB.get(`/user/getfav`,
     {
@@ -47,30 +46,30 @@ export const getFavourite = async ({uid, pid}) =>
     }
   );
 
-// done
+// add to fav
 export const addToFavourite = async ({uid, pid}) =>
   await MYDB.post(`/user/addfav`,{userId : uid , productId : pid});
 
-//done
+
+//deletefromfav
 export const deleteFromFavourite = async ({pid,uid}) =>
   await MYDB.patch(`/user/removefav`,{productId: pid , userId : uid});
+
 
 //Orders
 export const order = async  (data) => await MYDB.post(`/user/order`, data);
 
-export const getOrders = async (token) =>
-  await MYDB.get(`/user/userOrder`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+//get orders
+export const getOrders = async (data) =>
+  await MYDB.get(`/user/userOrder?userId=${data}`);
 
-//verify user 
-
-// export const VerfiUser = async (data) => 
-//   await Token.post("/user/verify", {
-//     headers: { Authorization: `${data}` }
-//   })
+// verify user
 export const VerfiUser = async (token) => {
   return await MYDB.post("/user/verify", {}, {
     headers: { Authorization: `Bearer ${token}` },
   });
 };
+
+
+// get category
+export const getCategory = async () => await MYDB.get("/category/getAllcategory");
