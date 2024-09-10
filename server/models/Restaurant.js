@@ -18,11 +18,6 @@ const PublishSchema = new Schema(
             type: String,
             required: [true, "Phone number is required"],
         },
-        email: {
-            type: String,
-            unique: true,
-            required: [true, "Email is required"],
-        },
         website: {
             type: String,
             default: null,
@@ -84,8 +79,8 @@ const PublishSchema = new Schema(
             },
         ],
         Location: {
-            lat: { type: Number, required: [true, "location required"] },
-            lng: { type: Number, required: [true, "location required"] },
+            type: String,
+            required: true
         },
     },
 

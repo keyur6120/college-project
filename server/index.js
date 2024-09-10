@@ -21,7 +21,7 @@ app.use(express.urlencoded({ extended: true })); // for form data
 
 app.use("/user/", UserRoutes);
 app.use("/food/", FoodRoutes);
-app.use("/newuser",MakeRestro)
+app.use("/Restro",MakeRestro)
 app.use("/category",Category)
 
 // error handler
