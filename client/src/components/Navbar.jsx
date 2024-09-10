@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import { Link as LinkR, NavLink , useNavigate} from "react-router-dom";
+import { Link as LinkR, NavLink, useNavigate } from "react-router-dom";
 import LogoImg from "../utils/Images/Logo.png";
 import {
   FavoriteBorder,
@@ -144,18 +144,18 @@ const TextButton = styled.span`
   }
 `;
 
-const AvatarButton  = styled.button`
-text-color : white;
-background : transparent;
-border : none ;
-cursor : pointer;
-font-weight: 600;
-`
+const AvatarButton = styled.button`
+  text-color: white;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+`;
 
 const Navbar = ({ setOpenAuth, openAuth, currentUser }) => {
   const [isOpen, setIsOpen] = useState(false);
   const dispatch = useDispatch();
-  const Navigate = useNavigate()
+  const Navigate = useNavigate();
 
   return (
     <Nav>
@@ -186,8 +186,9 @@ const Navbar = ({ setOpenAuth, openAuth, currentUser }) => {
           <Navlink to="/">Home</Navlink>
           <Navlink to="/dishes">Dishes</Navlink>
           {currentUser ? <Navlink to="/orders">Orders</Navlink> : null}
-          {/* <Navlink to="/orders">Orders</Navlink> */}
+          {currentUser ? <Navlink to="/Restaurant">Restaurants</Navlink> : null}
           <Navlink to="/contact">Contact</Navlink>
+          
         </NavItems>
 
         {isOpen && (
@@ -204,6 +205,10 @@ const Navbar = ({ setOpenAuth, openAuth, currentUser }) => {
 
             <Navlink to="/contact" onClick={() => setIsOpen(false)}>
               Contact
+            </Navlink>
+
+            <Navlink to="/Restaurant" onClick={() => setIsOpen(false)}>
+              Restaurant
             </Navlink>
             {currentUser ? (
               <>
@@ -249,9 +254,9 @@ const Navbar = ({ setOpenAuth, openAuth, currentUser }) => {
                 />
               </Navlink>
               <Avatar src={currentUser?.img}>
-                <AvatarButton onClick={()=> Navigate("/dishes")}>
+                <AvatarButton onClick={() => Navigate("/profile")}>
                   {currentUser?.name[0]}
-                  </AvatarButton>
+                </AvatarButton>
               </Avatar>
               <TextButton onClick={() => dispatch(logout())}>Logout</TextButton>
             </>

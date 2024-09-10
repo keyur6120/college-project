@@ -2,20 +2,14 @@ import axios from "axios";
 
 export const MYDB = axios.create({
   baseURL: " http://localhost:8080",
-
 });
-
-// const API = axios.create({
-//   baseURL: "https://fooddelivery-mern.onrender.com/api/"
-// })
 
 export const UserSignUp = async (data) => await MYDB.post("/user/signup", data);
 export const UserSignIn = async (data) => await MYDB.post("/user/signin", data);
 
 //products
-export const getAllProducts = async (filter) => await MYDB.get(`/food?${filter}`);
-
-
+export const getAllProducts = async (filter) =>
+  await MYDB.get(`/food?${filter}`);
 
 export const getProductDetails = async (id) => await MYDB.get(`/food/${id}`);
 
@@ -23,41 +17,43 @@ export const getProductDetails = async (id) => await MYDB.get(`/food/${id}`);
 
 export const getCart = async ({ uid }) =>
   await MYDB.get(`/user/getallcartItem`, {
-    params: { userId: uid }
+    params: { userId: uid },
   });
 
-
-// add to cart 
-// done 
+// add to cart
+// done
 export const addToCart = async ({ pid, uid, qun }) =>
-  await MYDB.post(`/user/addcart`, { productId: pid, userId: uid, quantity: qun });
-
+  await MYDB.post(`/user/addcart`, {
+    productId: pid,
+    userId: uid,
+    quantity: qun,
+  });
 
 // delete from cart
 //done
 export const deleteFromCart = async ({ pid, uid, qun }) =>
-  await MYDB.patch(`/user/RemovecartItem`, { productId: pid, quantity: qun, Id: uid });
+  await MYDB.patch(`/user/RemovecartItem`, {
+    productId: pid,
+    quantity: qun,
+    Id: uid,
+  });
 
 //favorites
-export const getFavourite = async ({uid, pid}) =>
-  await MYDB.get(`/user/getfav`,
-    {
-      params : {userId : uid}
-    }
-  );
+export const getFavourite = async ({ uid, pid }) =>
+  await MYDB.get(`/user/getfav`, {
+    params: { userId: uid },
+  });
 
 // add to fav
-export const addToFavourite = async ({uid, pid}) =>
-  await MYDB.post(`/user/addfav`,{userId : uid , productId : pid});
-
+export const addToFavourite = async ({ uid, pid }) =>
+  await MYDB.post(`/user/addfav`, { userId: uid, productId: pid });
 
 //deletefromfav
-export const deleteFromFavourite = async ({pid,uid}) =>
-  await MYDB.patch(`/user/removefav`,{productId: pid , userId : uid});
-
+export const deleteFromFavourite = async ({ pid, uid }) =>
+  await MYDB.patch(`/user/removefav`, { productId: pid, userId: uid });
 
 //Orders
-export const order = async  (data) => await MYDB.post(`/user/order`, data);
+export const order = async (data) => await MYDB.post(`/user/order`, data);
 
 //get orders
 export const getOrders = async (data) =>
@@ -65,11 +61,23 @@ export const getOrders = async (data) =>
 
 // verify user
 export const VerfiUser = async (token) => {
-  return await MYDB.post("/user/verify", {}, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  return await MYDB.post(
+    "/user/verify",
+    {},
+    {
+      headers: { Authorization: `Bearer ${token}` },
+    }
+  );
 };
 
-
 // get category
-export const getCategory = async () => await MYDB.get("/category/getAllcategory");
+export const getCategory = async () =>
+  await MYDB.get("/category/getAllcategory");
+
+// Restarant
+
+export const getRestaurants = async () =>
+  await MYDB.get("/Restro/GetRestaurant");
+
+export const getRestoById = async (id) =>
+  await MYDB.post(`/Restro/RestroById/${id}`);
